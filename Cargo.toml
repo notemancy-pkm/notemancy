@@ -1,0 +1,18 @@
+[package]
+name = "notemancy"
+version = "0.1.0"
+edition = "2024"
+
+[[bin]]
+name = "ncy"
+path = "src/main.rs"
+
+[dependencies]
+notemancy-core = { path = "../notemancy-core" }
+inquire = "0.7.5"
+nucleo-picker = "0.8.1"
+
+# [dev-dependencies]
+# assert_cmd = "2.0"
+# predicates = "2.1"
+# tempfile = "3.3"
