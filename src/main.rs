@@ -2,6 +2,7 @@ mod config;
 mod crud;
 mod edit;
 mod picker;
+mod vectorize;
 
 use config::{init_config, set_default_vault};
 use crud::new_note;
@@ -9,7 +10,24 @@ use edit::edit_note;
 use notemancy_core::config::get_vault_dir;
 use picker::pick_note;
 use std::env;
+use std::fs;
 use std::process;
+
+/// Helper function to get the default vault name from configuration.
+fn get_default_vault() -> Result<String, Box<dyn std::error::Error>> {
+    let conf_dir = env::var("NOTEMANCY_CONF_DIR")?;
+    let default_path = std::path::Path::new(&conf_dir).join("default_vault.txt");
+    if default_path.exists() {
+        let vault_name = fs::read_to_string(default_path)?;
+        let trimmed = vault_name.trim().to_string();
+        if trimmed.is_empty() {
+            return Err("No default vault set".into());
+        }
+        Ok(trimmed)
+    } else {
+        Err("No default vault set".into())
+    }
+}
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -72,6 +90,39 @@ fn main() {
                     eprintln!("Error: {}", err);
                     process::exit(1);
                 }
+            }
+        }
+        "vectorize" => {
+            // Determine which vault to use
+            let vault = if args.len() >= 3 {
+                args[2].clone()
+            } else {
+                // Use the default vault
+                match get_default_vault() {
+                    Ok(vault) => vault,
+                    Err(err) => {
+                        eprintln!(
+                            "Error: {}; please specify a vault with 'notemancy vectorize <vault_name>'",
+                            err
+                        );
+                        process::exit(1);
+                    }
+                }
+            };
+
+            // Create a new tokio runtime for async operations
+            let rt = match tokio::runtime::Runtime::new() {
+                Ok(rt) => rt,
+                Err(err) => {
+                    eprintln!("Error creating async runtime: {}", err);
+                    process::exit(1);
+                }
+            };
+
+            // Run vectorization
+            if let Err(err) = rt.block_on(vectorize::vectorize_vault(&vault)) {
+                eprintln!("Error vectorizing vault: {}", err);
+                process::exit(1);
             }
         }
         _ => {
