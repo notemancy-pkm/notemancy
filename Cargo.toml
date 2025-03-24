@@ -8,12 +8,16 @@ name = "ncy"
 path = "src/main.rs"
 
 [dependencies]
-notemancy-core = { path = "../notemancy-core" }
-hddb = { path = "../../new/hddb" }
+notemancy-core = "0.1.0"
+hddb = "0.2.0"
+# notemancy-core = { path = "../notemancy-core" }
+# hddb = { path = "../../new/hddb" }
 inquire = "0.7.5"
 nucleo-picker = "0.8.1"
 tokio = { version = "1.44.1", features = ["full"] }
 tch = "0.17"
+reqwest = { version = "0.11", features = ["blocking", "json"] }
+serde = "1.0.219"
 
 # [dev-dependencies]
 # assert_cmd = "2.0"

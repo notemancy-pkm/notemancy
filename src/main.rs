@@ -1,7 +1,10 @@
+// src/main.rs
+
 mod config;
 mod crud;
 mod edit;
 mod picker;
+mod publish; // new publish module
 mod vectorize;
 
 use config::{init_config, set_default_vault};
@@ -13,7 +16,6 @@ use std::env;
 use std::fs;
 use std::process;
 
-/// Helper function to get the default vault name from configuration.
 fn get_default_vault() -> Result<String, Box<dyn std::error::Error>> {
     let conf_dir = env::var("NOTEMANCY_CONF_DIR")?;
     let default_path = std::path::Path::new(&conf_dir).join("default_vault.txt");
@@ -67,7 +69,6 @@ fn main() {
             }
         }
         "-e" => {
-            // If a vault is specified with an '@' prefix (e.g., "-e @vault_name"), use that vault.
             let vault_arg = if args.len() >= 3 && args[2].starts_with('@') {
                 Some(args[2].trim_start_matches('@').to_string())
             } else {
@@ -93,11 +94,9 @@ fn main() {
             }
         }
         "vectorize" => {
-            // Determine which vault to use
             let vault = if args.len() >= 3 {
                 args[2].clone()
             } else {
-                // Use the default vault
                 match get_default_vault() {
                     Ok(vault) => vault,
                     Err(err) => {
@@ -110,7 +109,6 @@ fn main() {
                 }
             };
 
-            // Create a new tokio runtime for async operations
             let rt = match tokio::runtime::Runtime::new() {
                 Ok(rt) => rt,
                 Err(err) => {
@@ -119,9 +117,14 @@ fn main() {
                 }
             };
 
-            // Run vectorization
             if let Err(err) = rt.block_on(vectorize::vectorize_vault(&vault)) {
                 eprintln!("Error vectorizing vault: {}", err);
+                process::exit(1);
+            }
+        }
+        "publish" => {
+            if let Err(err) = publish::publish_notes() {
+                eprintln!("Error publishing notes: {}", err);
                 process::exit(1);
             }
         }
