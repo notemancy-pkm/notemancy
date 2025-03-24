@@ -755,6 +755,8 @@ checksum = "bf151400ff0baff5465007dd2f3e717f3fe502074ca563069ce3a6629d07b289"
 [[package]]
 name = "hddb"
 version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5a4e1949826a6be17a0a642cd15e86087ea2ee2d6c57766de871e3d31d93df17"
 dependencies = [
  "bincode",
  "hashbrown 0.12.3",
@@ -1272,6 +1274,8 @@ dependencies = [
 [[package]]
 name = "notemancy-core"
 version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "243df5705bbb776ca28f85669655e66e533dd268610ac9f2aaa88a357ecb6e69"
 dependencies = [
  "chrono",
  "once_cell",
